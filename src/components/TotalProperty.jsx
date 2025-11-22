@@ -1,6 +1,6 @@
 import { BarChart3, Eye, MessageSquare, ThumbsUp } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card' // Adjust path if needed (might be ../ui/card)
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { setBlog } from '@/redux/blogSlice'
@@ -11,46 +11,55 @@ const TotalProperty = () => {
     const [totalLikes, setTotalLikes] = useState(0)
     const dispatch = useDispatch()
 
+    // ✅ FIX: Use Environment Variables
+    const BASE_URL = import.meta.env.VITE_BASE_URL; 
+    
+    // Construct URLs dynamically
+    const OWN_BLOGS_URL = `${BASE_URL}${import.meta.env.VITE_GET_OWN_BLOGS}`;
+    const COMMENTS_URL = `${BASE_URL}${import.meta.env.VITE_COMMENTS_URL}`;
+    // Note: You might need to add VITE_MY_LIKES_URL to .env or construct it manually like below:
+    const LIKES_URL = `${BASE_URL}/blog/my-blogs/likes`; 
+
     const getOwnBlog = async () => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/v1/blog/get-own-blogs`, { withCredentials: true })
+            const res = await axios.get(OWN_BLOGS_URL, { withCredentials: true })
             if (res.data.success) {
                 dispatch(setBlog(res.data.blogs))
             }
         } catch (error) {
             console.log(error);
-
         }
     }
+    
     const getTotalComments = async()=>{
         try {
-          const res = await axios.get(`https://blog-application-invo.onrender.com/api/v1/comment/my-blogs/comments`,{withCredentials:true})
+          const res = await axios.get(COMMENTS_URL, {withCredentials:true})
           if(res.data.success){
              setTotalComments(res.data.totalComments)
           }
         } catch (error) {
           console.log(error);
-          
         }
     }
 
     const getTotalLikes = async()=>{
       try {
-        const res = await axios.get(`https://blog-application-invo.onrender.com/api/v1/blog/my-blogs/likes`,{withCredentials:true})
+        const res = await axios.get(LIKES_URL, {withCredentials:true})
         if(res.data.success){
            setTotalLikes(res.data.totalLikes)
         }
       } catch (error) {
        console.log(error);
-        
       }
     }
+    
     useEffect(()=>{
         getOwnBlog()
         getTotalComments()
         getTotalLikes()
     },[])
 
+    // ... rest of your render code (stats array, return statement) remains the same
     const stats = [
         {
           title: "Total Views",
